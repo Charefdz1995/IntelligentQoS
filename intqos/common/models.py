@@ -7,7 +7,14 @@ class interface(EmbededDocument):
 	interface_shelf = intField(required=False)
 	interface_slot = intField(required=True)
 	interface_port = intField(required=True)
-	interface_name = StringField(required=True)
+
+	@property
+	def interface_name(self):
+		if self.interface_shelf == None:
+			return '%s %s/%s' %(self.interface_type,self.interface_slot,self.interface_port)
+		else:
+			return '%s %s/%s/%s' %(self.interface_type,self.interface_shelf,self.interface_slot,self.interface_port)
+
 
 	meta = {'allow_inheritance': True}
 

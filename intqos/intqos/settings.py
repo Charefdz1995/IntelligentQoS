@@ -89,12 +89,12 @@ SESSION_ENGINE = 'mongoengine.django.sessions'
 _MONGODB_USER = 'mongouser'
 _MONGODB_PASSWD = 'password'
 _MONGODB_HOST = 'thehost'
-_MONGODB_NAME = 'thedb'
+_MONGODB_NAME = 'intqos'
 _MONGODB_DATABASE_HOST = \
     'mongodb://%s:%s@%s/%s' \
     % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
 
-mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
+mongoengine.connect(_MONGODB_NAME, host='0.0.0.0',port = 27017)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

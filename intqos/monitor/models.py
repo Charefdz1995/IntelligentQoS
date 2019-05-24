@@ -1,3 +1,10 @@
-from django.db import models
+from common.models import * 
 
-# Create your models here.
+
+
+class monitor(switch):
+	def configure_netflow():
+		pass 
+class phb_domain(topology):
+	def configure_netflow():
+		pass 
