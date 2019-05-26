@@ -133,3 +133,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+NET_CONF_TEMPLATES = os.path.join(BASE_DIR,'static/net_conf_templates')

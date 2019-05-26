@@ -33,6 +33,8 @@ class switch(EmbededDocument):
 
 	meta = {'allow_inheritance': True}
 
+
+
 class link_side(EmbededDocument):
 	switch = ReferenceField(switch)
 	interface = ReferenceField(interface)
