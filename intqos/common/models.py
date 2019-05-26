@@ -2,7 +2,7 @@ from mongoengine import *
 
 
 
-class interface(EmbededDocument):
+class interface_base(EmbededDocument):
 	interface_type = StringField(required=True)
 	interface_shelf = intField(required=False)
 	interface_slot = intField(required=True)
@@ -29,7 +29,7 @@ class access(EmbededDocument):
 class switch(EmbededDocument):
 	hostname = StringField(required=True)
 	management = EmbededDocumentField(access)
-	interfaces = listField(EmbededDocumentField(interface))
+	interfaces = listField(EmbededDocumentField(interface_base))
 
 	meta = {'allow_inheritance': True}
 
