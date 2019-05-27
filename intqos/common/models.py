@@ -4,9 +4,9 @@ from mongoengine import *
 
 class interface_base(DynamicEmbeddedDocument):
 	interface_type = StringField(required=True)
-	interface_shelf = intField(required=False)
-	interface_slot = intField(required=True)
-	interface_port = intField(required=True)
+	interface_shelf = IntField(required=False)
+	interface_slot = IntField(required=True)
+	interface_port = IntField(required=True)
 
 	@property
 	def interface_name(self):
@@ -29,7 +29,7 @@ class access(DynamicEmbeddedDocument):
 class switch(DynamicEmbeddedDocument):
 	hostname = StringField(required=True)
 	management = EmbededDocumentField(access)
-	interfaces = listField(EmbededDocumentField(interface_base))
+	interfaces = ListField(EmbededDocumentField(interface_base))
 
 	meta = {'allow_inheritance': True}
 
@@ -50,7 +50,7 @@ class link(DynamicEmbeddedDocument):
 
 class topology(DynamicDocument):
 	topology_name = StringField(required=True)
-	switches = listField(EmbededDocumentField(switch))
-	links = listField(EmbededDocumentField(link))
+	switches = ListField(EmbededDocumentField(switch))
+	links = ListField(EmbededDocumentField(link))
 
 	meta = {'allow_inheritance': True}
