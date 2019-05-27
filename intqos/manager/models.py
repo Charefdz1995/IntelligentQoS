@@ -19,12 +19,16 @@ class classification_class(EmbeddedDocument):
 	dscp_value = StringField()
 	priorty = StringField()
 	drop_prob = StringField()
+class regroupment_class(EmbeddedDocument):
+	name = StringField(required=True)
+	classes = classes = ListField(EmbeddedDocumentField(classification_class))
 class policyIn(EmbeddedDocument):
 	name = StringField(required=True)
 	classes = ListField(EmbeddedDocumentField(classification_class))
 class policyOut(EmbeddedDocument):
 	name = StringField(required=True)
 	classes = ListField(EmbeddedDocumentField(classification_class))
+	regroupment_classes = ListField(EmbeddedDocumentField(regroupment_class))
 class switch(switch):
 	zone_type = StringField(max_length=6, choices=zone_type)
 	policyIn = EmbeddedDocumentField(policyIn)
