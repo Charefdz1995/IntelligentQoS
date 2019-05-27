@@ -26,7 +26,7 @@ class access(DynamicEmbeddedDocument):
 
 	meta = {'allow_inheritance': True}
 
-class switch(EmbeddedDocument):
+class switch(DynamicEmbeddedDocument):
 	hostname = StringField(required=True)
 	management = EmbededDocumentField(access)
 	interfaces = listField(EmbededDocumentField(interface_base))
@@ -35,20 +35,20 @@ class switch(EmbeddedDocument):
 
 
 
-class link_side(EmbeddedDocument):
+class link_side(DynamicEmbeddedDocument):
 	switch = ReferenceField(switch)
 	interface = ReferenceField(interface)
 
 	meta = {'allow_inheritance': True}
 
-class link(EmbeddedDocument):
+class link(DynamicEmbeddedDocument):
 	link_description = StringField(required=False)
 	from_interface =  EmbededDocumentField(link_side)
 	to_interface = EmbededDocumentField(link_side)
 
 	meta = {'allow_inheritance': True}
 
-class topology(Document):
+class topology(DynamicDocument):
 	topology_name = StringField(required=True)
 	switches = listField(EmbededDocumentField(switch))
 	links = listField(EmbededDocumentField(link))
