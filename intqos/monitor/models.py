@@ -78,8 +78,13 @@ class phb_domain(topology):
 														str(i),str(i))
 			i += 1
 
-	def configure_netflow(self):
-		pass 
+	def configure_netflow(self,**kwargs):
+		for switch in switches:
+			switch.__class__ = monitor
+			configuration = switch.configure_netflow(kwargs.items)
+			switch.push_configuration(configuration)
+
+
 
 class netflow_collector(Document):
 	pass 

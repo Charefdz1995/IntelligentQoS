@@ -13,7 +13,7 @@ collect application name
 
 flow exporter IQoSExporter 
 destination {{kwargs.get('destination')}}
-source {{self.loopback_address}}
+source {{self.loopback_addr}}
 transport udp {{kwargs.get('port','2055')}}
 export-protocol netflow-v9
 template data timeout {{kwargs.get('template_data_timeout','60')}}
