@@ -16,7 +16,6 @@ class interface(interface_base):
 
 
 class monitor(switch):
-	loopback_address = StringField(required=True)
 		
 	def configure_netflow(self,**kwargs):
 		global_output = ""
@@ -47,9 +46,37 @@ class monitor(switch):
 			interfaces_output += interface.configure_netflow()
 
 		return global_output + interfaces_output
+	
+	def push_configuration(self,config):
+
+		from netmiko import ConnectHandler 
+
+		device_info = {
+			"device_type" : "cisco_ios", 
+			"ip" : self.management.management_address,
+			"username" : self.management.username, 
+			"password" : self.management.password, 
+		}
+
+		try:
+			device = ConnectHandler(**device_info)
+			config_commands = config.splitlines()
+			device.send_config_set(config_commands)
+			device.disconnect()
+		except Exception as e:
+			print (e) 
+		 
 		
 
+
 class phb_domain(topology):
+
+	def configure_loopback(self):
+		i = 1 
+		for switch in self.switches:
+			switch.loopback_addr = '{}.{}.{}.{}'.format(str(i),str(i),
+														str(i),str(i))
+			i += 1
 
 	def configure_netflow(self):
 		pass 

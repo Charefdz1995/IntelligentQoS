@@ -2,7 +2,7 @@ from mongoengine import *
 
 
 
-class interface_base(EmbededDocument):
+class interface_base(DynamicEmbeddedDocument):
 	interface_type = StringField(required=True)
 	interface_shelf = intField(required=False)
 	interface_slot = intField(required=True)
@@ -18,7 +18,7 @@ class interface_base(EmbededDocument):
 
 	meta = {'allow_inheritance': True}
 
-class access(EmbededDocument):
+class access(DynamicEmbeddedDocument):
 	management_address = StringField(required=True)
 	username = StringField(required=True)
 	password = StringField(required=True)
@@ -26,7 +26,7 @@ class access(EmbededDocument):
 
 	meta = {'allow_inheritance': True}
 
-class switch(EmbededDocument):
+class switch(EmbeddedDocument):
 	hostname = StringField(required=True)
 	management = EmbededDocumentField(access)
 	interfaces = listField(EmbededDocumentField(interface_base))
@@ -35,13 +35,13 @@ class switch(EmbededDocument):
 
 
 
-class link_side(EmbededDocument):
+class link_side(EmbeddedDocument):
 	switch = ReferenceField(switch)
 	interface = ReferenceField(interface)
 
 	meta = {'allow_inheritance': True}
 
-class link(EmbededDocument):
+class link(EmbeddedDocument):
 	link_description = StringField(required=False)
 	from_interface =  EmbededDocumentField(link_side)
 	to_interface = EmbededDocumentField(link_side)
