@@ -84,7 +84,5 @@ class phb_domain(topology):
 			configuration = switch.configure_netflow(kwargs.items)
 			switch.push_configuration(configuration)
 
-
-
 class netflow_collector(Document):
 	pass 

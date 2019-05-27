@@ -2,11 +2,11 @@ from mongoengine import *
 
 
 
-class interface_base(DynamicEmbeddedDocument):
+class interface_base(DynamicDocument):
 	interface_type = StringField(required=True)
-	interface_shelf = intField(required=False)
-	interface_slot = intField(required=True)
-	interface_port = intField(required=True)
+	interface_shelf = IntField(required=False)
+	interface_slot = IntField(required=True)
+	interface_port = IntField(required=True)
 
 	@property
 	def interface_name(self):
@@ -26,31 +26,28 @@ class access(DynamicEmbeddedDocument):
 
 	meta = {'allow_inheritance': True}
 
-class switch(DynamicEmbeddedDocument):
+class switch(DynamicDocument):
 	hostname = StringField(required=True)
-	management = EmbededDocumentField(access)
-	interfaces = listField(EmbededDocumentField(interface_base))
+	management = EmbeddedDocumentField(access)
+	interfaces = ListField(ReferenceField(interface_base))
 
 	meta = {'allow_inheritance': True}
 
 
 
-class link_side(DynamicEmbeddedDocument):
-	switch = ReferenceField(switch)
-	interface = ReferenceField(interface)
 
-	meta = {'allow_inheritance': True}
 
-class link(DynamicEmbeddedDocument):
-	link_description = StringField(required=False)
-	from_interface =  EmbededDocumentField(link_side)
-	to_interface = EmbededDocumentField(link_side)
+class link(DynamicDocument):
+	from_switch = ReferenceField(switch)
+	from_interface =  ReferenceField(interface_base)
+	to switch = ReferenceField(switch)
+	to_interface = ReferenceField(interface_base)
 
 	meta = {'allow_inheritance': True}
 
 class topology(DynamicDocument):
 	topology_name = StringField(required=True)
-	switches = listField(EmbededDocumentField(switch))
-	links = listField(EmbededDocumentField(link))
+	switches = ListField(ReferenceField(switch))
+	links = ListField(ReferenceField(link))
 
 	meta = {'allow_inheritance': True}
