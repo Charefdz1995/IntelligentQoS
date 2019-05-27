@@ -18,14 +18,14 @@ exit
 {% endif %}
 {% endfor %}
 {% endif %}
-{% for class in self.policyOut.classes %}
-class-map {{class.name}}
-{% for app in class.qos_applications %}
+{% for regroupment_class in self.policyOut.regroupment_classes %}
+class-map {{regroupment_class.name}}
+{% for class in regroupment_class.classes %}
 match ip dscp {{class.dscp_value}}
 {% endfor %}
 {% endfor %}
 policy-map {{self.policyOut.name}}
-{% for class in self.policyOut.classes %}
+{% for class in self.policyOut.regroupment_classes %}
 class {{class.name}}
 {% endfor %}
 class class-default
