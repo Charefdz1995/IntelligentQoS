@@ -14,9 +14,11 @@ class interface_base(DynamicDocument):
         @property
         def interface_name(self):
                 if self.interface_shelf == None:
-                        return '%s %s/%s' %(self.interface_type,self.interface_slot,self.interface_port)
+                        return '%s %s/%s' %(self.interface_type,self.interface_slot,
+                                        self.interface_port)
                 else:
-                        return '%s %s/%s/%s' %(self.interface_type,self.interface_shelf,self.interface_slot,self.interface_port)
+                        return '%s %s/%s/%s' %(self.interface_type,self.interface_shelf,
+                                                self.interface_slot,self.interface_port)
 
 
         meta = {'allow_inheritance': True}
