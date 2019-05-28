@@ -1,0 +1,40 @@
+{% if self.zone_type == 'Ingress'  %}
+{% for class in self.policyIn.classes %}
+class-map {{class.match_type}} {{class.name}}
+{% for match in class.matches %}
+match {{match}}
+{% endfor %}
+{% endfor %}
+policy-map {{self.policyIn.name}}
+{% for class in self.policyIn.classes %}
+class {{class.name}}
+set dscp {{class.dscp_value}}
+{% endfor %}
+{% for interface in self.interfaces %}
+{% if interface.zone_type == 'Ingress'  %}
+interface {{interface.name}}
+service-policy input {{self.policyIn.name}}
+exit
+{% endif %}
+{% endfor %}
+{% endif %}
+{% for regroupment_class in self.policyOut.regroupment_classes %}
+class-map {{regroupment_class.name}}
+{% for class in regroupment_class.classes %}
+match ip dscp {{class.dscp_value}}
+{% endfor %}
+{% endfor %}
+policy-map {{self.policyOut.name}}
+{% for class in self.policyOut.regroupment_classes %}
+class {{class.name}}
+{% endfor %}
+class class-default
+fair-queue
+random-detect dscp-based
+{% for interface in self.interfaces %}
+{% if interface.zone_type == 'Egress'  %}
+interface {{interface.name}}
+service-policy output {{self.policyOut.name}}
+exit
+{% endif %}
+{% endfor %}
