@@ -46,7 +46,17 @@ class monitor(switch):
 			interfaces_output += interface.configure_netflow()
 
 		return global_output + interfaces_output
+
+	def configure_ip_sla_responder(self):
+
+		return ['ip sla responder']	# List because push configuration works with push config set 
+		
+	def configure ip_sla(self,operation):
+		pass 
 	
+	def pull_ip_sla_stats(self):
+		pass
+
 	def push_configuration(self,config):
 
 		from netmiko import ConnectHandler 
@@ -64,8 +74,7 @@ class monitor(switch):
 			device.send_config_set(config_commands)
 			device.disconnect()
 		except Exception as e:
-			print (e) 
-		 
+			print (e)  
 		
 
 
@@ -84,5 +93,13 @@ class phb_domain(topology):
 			configuration = switch.configure_netflow(kwargs.items)
 			switch.push_configuration(configuration)
 
-class netflow_collector(Document):
-	pass 
+class flow(Document):
+	ipv4_src_addr = StringField(required = True)
+	ipv4_dst_addr = StringField(required = True)
+	ipv4_protocol = StringField(required = True)
+	transport_src_port = StringField(required = True)
+	transport_dst_port = StringField(required = True)
+	type_of_service = IntField(required = True)
+	application_name = StringField(required = True)
+	counter_bytes = IntField(required = True)
+	counter_pkts = IntField(required = True)

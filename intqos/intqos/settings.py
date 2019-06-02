@@ -82,17 +82,16 @@ DATABASES = {
     }
 }
 
-SESSION_ENGINE = 'mongoengine.django.sessions' 
 
 
 # test mongoengine configuration
-_MONGODB_USER = 'mongouser'
-_MONGODB_PASSWD = 'password'
-_MONGODB_HOST = 'thehost'
-_MONGODB_NAME = 'intqos'
-_MONGODB_DATABASE_HOST = \
-    'mongodb://%s:%s@%s/%s' \
-    % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
+#_MONGODB_USER = 'mongouser'
+#_MONGODB_PASSWD = 'password'
+#_MONGODB_HOST = 'thehost'
+#_MONGODB_NAME = 'intqos'
+#_MONGODB_DATABASE_HOST = \
+ #   'mongodb://%s:%s@%s/%s' \
+#  % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
 
 mongoengine.connect(_MONGODB_NAME, host='0.0.0.0',port = 27017)
 
