@@ -3,7 +3,7 @@ from .models import *
 
 def packet_parser(self):
 	flow_instance = flow()
-	flow_instance.ipv4_src_addr = self[]
+	flow_instance.ipv4_src_addr = self[NetflowRecordV9].IPV4_SRC_ADDR
 	flow_instance.ipv4_dst_addr = self[]
 	flow_instance.ipv4_protocol = self[]
 	flow_instance.transport_src_port = self[]
