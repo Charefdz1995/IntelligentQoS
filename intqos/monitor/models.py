@@ -103,3 +103,9 @@ class flow(Document):
 	application_name = StringField(required = True)
 	counter_bytes = IntField(required = True)
 	counter_pkts = IntField(required = True)
+	first_switched = StringField(required = True)
+	last_switched  = StringField(required = True)
+	collection_time = StringField(required = True)
+	interface_index = IntField(required = True)
+	device = ReferenceField(monitor)
+	
