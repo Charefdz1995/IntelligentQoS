@@ -96,16 +96,21 @@ class phb_domain(topology):
 class flow(Document):
 	ipv4_src_addr = StringField(required = True)
 	ipv4_dst_addr = StringField(required = True)
-	ipv4_protocol = StringField(required = True)
-	transport_src_port = StringField(required = True)
-	transport_dst_port = StringField(required = True)
+	ipv4_protocol = IntField(required = True)
+	transport_src_port = IntField(required = True)
+	transport_dst_port = IntField(required = True)
 	type_of_service = IntField(required = True)
 	application_name = StringField(required = True)
 	counter_bytes = IntField(required = True)
 	counter_pkts = IntField(required = True)
-	first_switched = StringField(required = True)
-	last_switched  = StringField(required = True)
+	first_switched = FloatField(required = True)
+	last_switched  = FloatField(required = True)
+	#QoS parameters
+	bandwidth = FloatField(required = False)
+	delay = FloatField(required = False)
+	jitter = FloatField(required = False)
+	packet_loss = IntField(required = False)
+	#======================++++++=====+++++
 	collection_time = StringField(required = True)
 	interface_index = IntField(required = True)
 	device = ReferenceField(monitor)
-	

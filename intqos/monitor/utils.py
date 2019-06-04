@@ -18,6 +18,7 @@ def packet_parser(self):
 		flow_instance.counter_pkts = int.from_bytes(record.IN_PKTS,'big')
 		flow_instance.first_switched = record.FIRST_SWITCHED
 		flow_instance.last_switched = record.LAST_SWITCHED
+		flow_instance.bandwidth = (record.LAST_SWITCHED - record.FIRST_SWITCHED) / 1000 * 8 * record.IN_PKTS # bandwidth in bps 
 		flow_instance.interface_index = int.from_bytes(record.INPUT_SNMP,'big')
 		flow_instance.collection_time = sys_uptime # the collection time isdefined before in this function
 		flow_instance.device = device # TODO : some work here quering the db searching for who send this packets
