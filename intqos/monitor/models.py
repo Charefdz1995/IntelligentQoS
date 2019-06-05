@@ -93,7 +93,7 @@ class phb_domain(topology):
 			configuration = switch.configure_netflow(kwargs.items)
 			switch.push_configuration(configuration)
 
-class flow(Document):
+class flow(DynamicDocument):
 	ipv4_src_addr = StringField(required = True)
 	ipv4_dst_addr = StringField(required = True)
 	ipv4_protocol = IntField(required = True)
@@ -101,6 +101,13 @@ class flow(Document):
 	transport_dst_port = IntField(required = True)
 	type_of_service = IntField(required = True)
 	application_name = StringField(required = True)
+	
+	
+	
+
+class netflow_fields(DynamicDocument):
+
+	#Real time information about flow in the monitor. 
 	counter_bytes = IntField(required = True)
 	counter_pkts = IntField(required = True)
 	first_switched = FloatField(required = True)
@@ -110,7 +117,11 @@ class flow(Document):
 	delay = FloatField(required = False)
 	jitter = FloatField(required = False)
 	packet_loss = IntField(required = False)
-	#======================++++++=====+++++
+	#=======================================
+	# Device related Information
 	collection_time = StringField(required = True)
 	interface_index = IntField(required = True)
 	device = ReferenceField(monitor)
+	flow = ReferenceField(flow)
+	#=======================================
+
