@@ -10,6 +10,8 @@ class interface_base(DynamicDocument):
         interface_shelf = IntField(required=False)
         interface_slot = IntField(required=True)
         interface_port = IntField(required=True)
+        interface_address = StringField(required=False)
+        interface_mask = StringField(required=False)
 
         @property
         def interface_name(self):
