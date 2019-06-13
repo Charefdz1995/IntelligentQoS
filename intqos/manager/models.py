@@ -10,16 +10,51 @@ zone_type = (('Egress', 'Egress'),('Ingress', 'Ingress'))
 match_type =('match-any','match-all')
 priorty =('high','priority','normal','low')
 
-class interface(interface_base):
-	zone_type = StringField(max_length=6, choices=zone_type)
+class deparetment(EmbeddedDocument):
+	name = StringField()
+	address = StringField()
+	mask = StringField()
+	@property
+	def wild_card(self):
+		wildcard = []
+		for x in self.mask.split('.'):
+        		a=255-int(x)
+        		wildcard.append(a)
+		a=''
+		for x in wildcard:
+        		a=a+str(x)
+        		if wildcard.index(x)<3:
+                		a=a+'.'
+		return a
 
-class classification_class(EmbeddedDocument):
+class filter(EmbeddedDocument):
+	name = StringField()
+	source = EmbeddedDocumentField(deparetment)
+	dest = EmbeddedDocumentField(deparetment)
+	acl = StringField()
+class dscp(EmbeddedDocument):
+	dscp_value=StringField(required=True)
+	jitter_ref= StringField()
+	delay_ref= StringField()
+	packetloss_ref= StringField()
+	bandwith_ref= StringField()
+
+class application(EmbeddedDocument):
 	name = StringField(required=True)
-	match_type = StringField(choices=match_type)
-	matches = ListField(StringField())
-	dscp_value = StringField()
+	match = StringField()
+	dscp_value = EmbeddedDocumentField(dscp)
 	priorty = StringField()
 	drop_prob = StringField()
+	match_type = StringField(choices=match_type)
+class classification_class(EmbeddedDocument):
+	name = StringField()
+	application = EmbeddedDocumentField(application)
+	filter = EmbeddedDocumentField(filter)
+	match_type = StringField(choices=match_type)
+#------------------------------------------------------------------------
+
+class interface(interface_base):
+	zone_type = StringField(choices=zone_type)
 class policing(EmbeddedDocument):
 	cir = IntField(required=True)
 	pir = IntField(required=True)
@@ -40,7 +75,7 @@ class avoidance(EmbeddedDocument):
 	ecn = BooleanField()
 class regroupment_class(EmbeddedDocument):
 	name = StringField(required=True)
-	classes = classes = ListField(EmbeddedDocumentField(classification_class))
+	classes = ListField(EmbeddedDocumentField(application))
 	shaping = EmbeddedDocumentField(shaping)
 	policing = EmbeddedDocumentField(policing)
 	avoidance = EmbeddedDocumentField(avoidance)
@@ -53,17 +88,11 @@ class policyOut(EmbeddedDocument):
 	classes = ListField(EmbeddedDocumentField(classification_class))
 	regroupment_classes = ListField(EmbeddedDocumentField(regroupment_class))
 class switch(switch):
-	zone_type = StringField(max_length=6, choices=zone_type)
+	zone_type = StringField(choices=zone_type)
 	policyIn = EmbeddedDocumentField(policyIn)
 	policyOut = EmbeddedDocumentField(policyOut)
 	def baseline(self):
 		env = Environment(loader = FileSystemLoader(NET_CONF_TEMPLATES))
 		template = env.get_template("baseline.j2")
 		output = template.render(self = self)
-class deparetment(EmbeddedDocument):
-	name = StringField(max_length=6)
-	address = StringField(max_length=6)
-	priorty = StringField(max_length=6, choices=priorty)
-class backup(EmbeddedDocument):
-	starttime = StringField(max_length=6)
-	endtime = StringField(max_length=6)
+		return output
