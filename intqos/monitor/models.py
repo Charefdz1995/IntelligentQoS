@@ -120,7 +120,8 @@ class netflow_fields(DynamicDocument):
 	#=======================================
 	# Device related Information
 	collection_time = StringField(required = True)
-	interface_index = IntField(required = True)
+	input_int = IntField(required = True)
+	output_int = IntField(required = True)
 	device = ReferenceField(monitor)
 	flow = ReferenceField(flow)
 	#=======================================
