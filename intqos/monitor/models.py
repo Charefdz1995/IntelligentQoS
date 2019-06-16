@@ -2,10 +2,9 @@ from mongoengine import *
 from common.models import * 
 from jinja2 import Environment, FileSystemLoader
 from intqos.settings import NET_CONF_TEMPLATES
-from exception import * 
 
 
-class interface(interface_base):
+class interface(interface):
 
 	def configure_netflow(self):
 		output = ""
@@ -15,50 +14,39 @@ class interface(interface_base):
 		return output
 
 
-class monitor(switch):
-		
-	def configure_netflow(self,**kwargs):
+class device(device):
+
+	networks = ListField(StringField())
+	def get_networks(self):
+		for interface in self.
+	def configure_netflow(self,destination):
 		global_output = ""
 		interfaces_output = ""
-		expected_kwargs = ['destination','port','source','template_data_timeout',
-							'application_table_timeout','application_attribute_timeout', 
-							'cache_timeout_active','cache_timeout_inactive']
+
 		env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
 		template = env.get_template("global_netflow_config.j2")
-		try:
-
-			destination = kwargs.get('destination')
-			if destination == None:
-				raise NotExistingDestination
-			for kwarg in kwargs.items():
-				if kwarg not in expected_kwargs:
-					raise NotDefinedParameter
-
-		output = template.render(kwargs = kwargs,self= self)
-
-		except NotExistingDestination as e:
-			print(e)
-		except NotDefinedParameter as e  :
-			print(e)
-
+		
+		output = template.render(dst = destination)
 
 		for interface in self.interfaces : 
 			interfaces_output += interface.configure_netflow()
 
 		return global_output + interfaces_output
 
-	def configure_ip_sla_responder(self):
+	def configure_ip_sla(self,operation,dst_ip,dst_port,src_ip,src_port):
+        env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
+        template = env.get_template("ip_sla.j2")
+                
+        output = template.render(operation = operation,dst_ip =dst_ip,
+                                dst_port = dst_port ,src_ip = src_ip ,src_port = src_port)
 
-		return ['ip sla responder']	# List because push configuration works with push config set 
-		
-	def configure ip_sla(self,operation):
-		pass 
-	
-	def pull_ip_sla_stats(self):
-		pass
+        return output
 
-	def push_configuration(self,config):
+    def configure_ip_sla_responder(self):
+    	return ["ip sla responder"]
 
+
+	def push_config(self,config_commands)
 		from netmiko import ConnectHandler 
 
 		device_info = {
@@ -74,24 +62,16 @@ class monitor(switch):
 			device.send_config_set(config_commands)
 			device.disconnect()
 		except Exception as e:
-			print (e)  
-		
+			print(e)
 
 
-class phb_domain(topology):
+class topology(topology):
+	def get_ip_sla_devices(self,record):
+		src_ip = record.IPV4.SRC.ADDR 
+		dst_ip = record.IPV4.DST.ADDR 
+		for device in self.devices:
 
-	def configure_loopback(self):
-		i = 1 
-		for switch in self.switches:
-			switch.loopback_addr = '{}.{}.{}.{}'.format(str(i),str(i),
-														str(i),str(i))
-			i += 1
 
-	def configure_netflow(self,**kwargs):
-		for switch in switches:
-			switch.__class__ = monitor
-			configuration = switch.configure_netflow(kwargs.items)
-			switch.push_configuration(configuration)
 
 class flow(DynamicDocument):
 	ipv4_src_addr = StringField(required = True)
@@ -101,7 +81,6 @@ class flow(DynamicDocument):
 	transport_dst_port = IntField(required = True)
 	type_of_service = IntField(required = True)
 	application_name = StringField(required = True)
-	
 	
 	
 
@@ -114,15 +93,24 @@ class netflow_fields(DynamicDocument):
 	last_switched  = FloatField(required = True)
 	#QoS parameters
 	bandwidth = FloatField(required = False)
-	delay = FloatField(required = False)
-	jitter = FloatField(required = False)
-	packet_loss = IntField(required = False)
 	#=======================================
 	# Device related Information
 	collection_time = StringField(required = True)
 	input_int = IntField(required = True)
 	output_int = IntField(required = True)
-	device = ReferenceField(monitor)
+	device = ReferenceField(device)
 	flow = ReferenceField(flow)
 	#=======================================
 
+class ip_sla(document):
+	operation = IntField(required= True)
+
+
+
+class ip_sla_info(document):
+	avg_jitter = IntField(required = True)
+	avg_delay = IntField(required = True)
+    packet_loss = IntField(required = True)
+    timestamp = StringField(required = True)
+    flow_ref = ReferenceField(flow)
+    ip_sla_info = ReferenceField(ip_sla)

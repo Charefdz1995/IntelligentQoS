@@ -1,17 +1,16 @@
 from mongoengine import *
 
 
-connect('exdb',host = '0.0.0.0',port = 27017)
+interface_type_choices = ("FastEthernet","Ethernet", "GigaEthernet", "Serial")
 
-
-
-class interface_base(DynamicDocument):
-        interface_type = StringField(required=True)
+class interface(DynamicDocument):
+        interface_type = StringField(required=True, choices = interface_type_choices)
         interface_shelf = IntField(required=False)
         interface_slot = IntField(required=True)
         interface_port = IntField(required=True)
         interface_address = StringField(required=False)
         interface_mask = StringField(required=False)
+        ingress = BooleanField(default = False)
 
         @property
         def interface_name(self):
@@ -21,9 +20,7 @@ class interface_base(DynamicDocument):
                 else:
                         return '%s %s/%s/%s' %(self.interface_type,self.interface_shelf,
                                                 self.interface_slot,self.interface_port)
-
-
-        meta = {'allow_inheritance': True}
+        meta = {'abstract': True}
 
 class access(DynamicEmbeddedDocument):
         management_address = StringField(required=True)
@@ -31,18 +28,12 @@ class access(DynamicEmbeddedDocument):
         password = StringField(required=True)
         enable_secret = StringField(required=True)
 
-        meta = {'allow_inheritance': True}
-
-class switch(DynamicDocument):
+class device(DynamicDocument):
         hostname = StringField(required=True)
         management = EmbeddedDocumentField(access)
         interfaces = ListField(ReferenceField(interface_base))
-
-        meta = {'allow_inheritance': True}
-
-
-
-
+        loopback_addr = StringField()
+        meta = {'abstract': True}
 
 class link(DynamicDocument):
         from_switch = ReferenceField(switch)
@@ -50,9 +41,10 @@ class link(DynamicDocument):
         to_switch = ReferenceField(switch)
         to_interface = ReferenceField(interface_base)
 
-        meta = {'allow_inheritance': True}
+        meta = {'abstract': True}
 
 class topology(DynamicDocument):
         topology_name = StringField(required=True)
-        switches = ListField(ReferenceField(switch))
+        devices = ListField(ReferenceField(device))
         links = ListField(ReferenceField(link))
+        meta = {'abstract' : True}

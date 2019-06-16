@@ -5,6 +5,7 @@ match ipv4 protocol
 match transport source-port 
 match transport destination-port 
 match interface input 
+match interface output
 collect counter bytes
 collect counter packets 
 collect timestamp sys-uptime first
@@ -12,18 +13,18 @@ collect timestamp sys-uptime last
 collect application name
 
 flow exporter IQoSExporter 
-destination {{kwargs.get('destination')}}
+destination {{ dst }}
 source {{self.loopback_addr}}
-transport udp {{kwargs.get('port','2055')}}
+transport udp 2055
 export-protocol netflow-v9
-template data timeout {{kwargs.get('template_data_timeout','60')}}
-option application-table timeout {{kwargs.get('application_table_timeout','60')}}
-option application-attributes timeout  {{kwargs.get('application_attribute_timeout','30')}}
+template data timeout 60
+option application-table timeout 60
+option application-attributes timeout  30
 
 
 flow monitor IQoSmonitor 
 record IQoSrecorder
 exporter IQoSexporter 
-cache timeout active {{kwargs.get('cache_timeout_active','60')}}
-cache timeout inactive {{kwargs.get('cache_timeout_inactive','15')}}
+cache timeout active 60
+cache timeout inactive 15
 exit
