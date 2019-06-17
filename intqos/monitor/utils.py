@@ -6,8 +6,9 @@ from scapy.all import *
 from scapy.layers.netflow import NetflowSession
 from jinja2 import Environment, FileSystemLoader
 from intqos.settings import NET_CONF_TEMPLATES
+import re 
 
-def dbcollect(pkt):
+def dbcollect(pkt,phb_behavior):
         mongoengine.connect("flowsdb", host = "0.0.0.0",port = 27017)
         sys_uptime = pkt[NetflowHeaderV9].sysUptime
         monitor  = device.objects(pkt[IP].src)[0]
@@ -74,22 +75,7 @@ def Sniff_Netflow():
 
 
 
-def configure_ip_sla_responder(self):
-        return ['ip sla responder']
-                
-def configure ip_sla(self,operation,dst_ip,dst_port,src_ip,src_port):
-        global_output = ""
-        interfaces_output = ""
-        env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
-        template = env.get_template("ip_sla.j2")
-                
-        output = template.render(operation = operation,dst_ip =dst_ip,
-                                dst_port = dst_port ,src_ip = src_ip ,src_port = src_port)
 
-        return output
-        
-def pull_ip_sla_stats(operation):
-        pass
 
 
 

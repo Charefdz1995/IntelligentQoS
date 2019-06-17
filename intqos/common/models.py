@@ -1,6 +1,5 @@
 from mongoengine import *
 
-
 interface_type_choices = ("FastEthernet","Ethernet", "GigaEthernet", "Serial")
 
 class interface(DynamicDocument):
@@ -31,15 +30,15 @@ class access(DynamicEmbeddedDocument):
 class device(DynamicDocument):
         hostname = StringField(required=True)
         management = EmbeddedDocumentField(access)
-        interfaces = ListField(ReferenceField(interface_base))
+        interfaces = ListField(ReferenceField(interface))
         loopback_addr = StringField()
         meta = {'abstract': True}
 
 class link(DynamicDocument):
-        from_switch = ReferenceField(switch)
-        from_interface =  ReferenceField(interface_base)
-        to_switch = ReferenceField(switch)
-        to_interface = ReferenceField(interface_base)
+        from_switch = ReferenceField(device)
+        from_interface =  ReferenceField(interface)
+        to_switch = ReferenceField(device)
+        to_interface = ReferenceField(interface)
 
         meta = {'abstract': True}
 

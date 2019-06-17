@@ -16,36 +16,43 @@ class interface(interface):
 
 class device(device):
 
-	networks = ListField(StringField())
-	def get_networks(self):
-		for interface in self.
 	def configure_netflow(self,destination):
 		global_output = ""
 		interfaces_output = ""
 
 		env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
 		template = env.get_template("global_netflow_config.j2")
-		
 		output = template.render(dst = destination)
-
 		for interface in self.interfaces : 
 			interfaces_output += interface.configure_netflow()
 
 		return global_output + interfaces_output
 
 	def configure_ip_sla(self,operation,dst_ip,dst_port,src_ip,src_port):
-        env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
-        template = env.get_template("ip_sla.j2")
-                
-        output = template.render(operation = operation,dst_ip =dst_ip,
-                                dst_port = dst_port ,src_ip = src_ip ,src_port = src_port)
+		env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
+		template = env.get_template("ip_sla.j2")
+		output = template.render(operation = operation,dst_ip =dst_ip,
+								dst_port = dst_port ,src_ip = src_ip ,src_port = src_port)
 
-        return output
+		return output
+	def configure_ip_sla_responder(self):
+        return ['ip sla responder']
 
-    def configure_ip_sla_responder(self):
-    	return ["ip sla responder"]
+    def pull_ip_sla_stats(operation,src_device):
+        jitter_cmd = "show ip sla statistics {} | include Destination to Source Jitter".format(str(operation))
+        delay_cmd = "show ip sla statistics {} | include Destination to Source Latency".format(str(operation))
+        pakcet_loss = None 
+        # The result are saved here to be parsed 
 
+        result_jitter = None 
+        result_delay = None 
 
+        # after getting the result of this 
+        jitter = re.findall("\+d",result_jitter)
+        jitter = int(jitter[1])
+        delay = re.findall("\+d",result_delay)
+        delay = int(delay[1])
+        
 	def push_config(self,config_commands)
 		from netmiko import ConnectHandler 
 
@@ -66,10 +73,31 @@ class device(device):
 
 
 class topology(topology):
+
 	def get_ip_sla_devices(self,record):
-		src_ip = record.IPV4.SRC.ADDR 
-		dst_ip = record.IPV4.DST.ADDR 
+		from netaddr import * 
+		src_ip = IPAddress(record.IPV4.SRC.ADDR) 
+		dst_ip = IPAddress(record.IPV4.DST.ADDR)
+		src_device = None
+		dst_device = None  
 		for device in self.devices:
+			for interface in self.interfaces:
+				net_mask = IPAddress(interface.interface_mask)
+				notwork = IPNetwork(interface.interface_address)
+				notwork.prefixlen = net_mask.netmask_bits()
+				if src_ip in notwork:
+					src_device = device
+				if dst_ip in network:
+					dst_device = device
+		return src_device,dst_device
+
+
+	def kill_ip_sla(self): #TODO : killing the ip sla of inactive flows after 5 min 
+		pass 
+
+
+
+
 
 
 
@@ -110,7 +138,7 @@ class ip_sla(document):
 class ip_sla_info(document):
 	avg_jitter = IntField(required = True)
 	avg_delay = IntField(required = True)
-    packet_loss = IntField(required = True)
-    timestamp = StringField(required = True)
-    flow_ref = ReferenceField(flow)
-    ip_sla_info = ReferenceField(ip_sla)
+	packet_loss = IntField(required = True)
+	timestamp = StringField(required = True)
+	flow_ref = ReferenceField(flow)
+	ip_sla_info = ReferenceField(ip_sla)
