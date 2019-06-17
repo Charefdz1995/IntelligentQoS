@@ -72,13 +72,3 @@ def dbcollect(pkt,phb_behavior):
 
 def Sniff_Netflow():
         sniff(session = NetflowSession , filter = "dst port 2055", prn = dbcollect)
-
-
-
-
-
-
-
-
-def get_ip_sla_devices(src_ip, src_dst):
-        pass 

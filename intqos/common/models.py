@@ -32,6 +32,7 @@ class device(DynamicDocument):
         management = EmbeddedDocumentField(access)
         interfaces = ListField(ReferenceField(interface))
         loopback_addr = StringField()
+        
         meta = {'abstract': True}
 
 class link(DynamicDocument):
