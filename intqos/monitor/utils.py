@@ -4,11 +4,8 @@ from mongoengine import *
 import mongoengine
 from scapy.all import * 
 from scapy.layers.netflow import NetflowSession
-from jinja2 import Environment, FileSystemLoader
-from intqos.settings import NET_CONF_TEMPLATES
-import re 
 
-def dbcollect(pkt,phb_behavior):
+def dbcollect(pkt):
         mongoengine.connect("flowsdb", host = "0.0.0.0",port = 27017)
         sys_uptime = pkt[NetflowHeaderV9].sysUptime
         monitor  = device.objects(pkt[IP].src)[0]
