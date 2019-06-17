@@ -1,7 +1,9 @@
-from mongoengine import * 
-from common.models import * 
+import re
+from netaddr import *
+from mongoengine import *
+from intqos.common.models import *
 from jinja2 import Environment, FileSystemLoader
-from intqos.settings import NET_CONF_TEMPLATES
+from intqos.intqos.settings import NET_CONF_TEMPLATES
 
 
 class interface(interface):
@@ -36,24 +38,24 @@ class device(device):
 
 		return output
 	def configure_ip_sla_responder(self):
-        return ['ip sla responder']
+		return ['ip sla responder']
 
-    def pull_ip_sla_stats(operation,src_device):
-        jitter_cmd = "show ip sla statistics {} | include Destination to Source Jitter".format(str(operation))
-        delay_cmd = "show ip sla statistics {} | include Destination to Source Latency".format(str(operation))
-        pakcet_loss = None 
-        # The result are saved here to be parsed 
+	def pull_ip_sla_stats(operation,src_device):
+		jitter_cmd = "show ip sla statistics {} | include Destination to Source Jitter".format(str(operation))
+		delay_cmd = "show ip sla statistics {} | include Destination to Source Latency".format(str(operation))
+		pakcet_loss = None
+		# The result are saved here to be parsed
 
-        result_jitter = None 
-        result_delay = None 
+		result_jitter = None
+		result_delay = None
 
-        # after getting the result of this 
-        jitter = re.findall("\+d",result_jitter)
-        jitter = int(jitter[1])
-        delay = re.findall("\+d",result_delay)
-        delay = int(delay[1])
+		# after getting the result of this
+		jitter = re.findall("\+d",result_jitter)
+		jitter = int(jitter[1])
+		delay = re.findall("\+d",result_delay)
+		delay = int(delay[1])
         
-	def push_config(self,config_commands)
+	def push_config(self,config_commands):
 		from netmiko import ConnectHandler 
 
 		device_info = {
@@ -65,7 +67,7 @@ class device(device):
 
 		try:
 			device = ConnectHandler(**device_info)
-			config_commands = config.splitlines()
+			config_commands = config_commands.splitlines()
 			device.send_config_set(config_commands)
 			device.disconnect()
 		except Exception as e:
@@ -75,17 +77,17 @@ class device(device):
 class topology(topology):
 
 	def get_ip_sla_devices(self,record):
-		from netaddr import * 
+
 		src_ip = IPAddress(record.IPV4.SRC.ADDR) 
 		dst_ip = IPAddress(record.IPV4.DST.ADDR)
 		src_device = None
 		dst_device = None  
 		for device in self.devices:
-			for interface in self.interfaces:
+			for interface in device.interfaces:
 				net_mask = IPAddress(interface.interface_mask)
-				notwork = IPNetwork(interface.interface_address)
-				notwork.prefixlen = net_mask.netmask_bits()
-				if src_ip in notwork:
+				network = IPNetwork(interface.interface_address)
+				network.prefixlen = net_mask.netmask_bits()
+				if src_ip in network:
 					src_device = device
 				if dst_ip in network:
 					dst_device = device
