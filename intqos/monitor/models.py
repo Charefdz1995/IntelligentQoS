@@ -1,9 +1,9 @@
 import re
 from netaddr import *
 from mongoengine import *
-from intqos.common.models import *
+from common.models import *
 from jinja2 import Environment, FileSystemLoader
-from intqos.intqos.settings import NET_CONF_TEMPLATES
+from intqos.settings import NET_CONF_TEMPLATES
 
 
 class interface(interface):
@@ -132,12 +132,12 @@ class netflow_fields(DynamicDocument):
 	flow = ReferenceField(flow)
 	#=======================================
 
-class ip_sla(document):
+class ip_sla(Document):
 	operation = IntField(required= True)
 
 
 
-class ip_sla_info(document):
+class ip_sla_info(Document):
 	avg_jitter = IntField(required = True)
 	avg_delay = IntField(required = True)
 	packet_loss = IntField(required = True)
