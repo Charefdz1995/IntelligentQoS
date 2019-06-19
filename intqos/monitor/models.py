@@ -133,8 +133,6 @@ class ip_sla(document):
 	operation = SequenceField()
 	device_ref = ReferenceField(device)
 
-class ip_sla(Document):
-	operation = IntField(required= True)
 
 
 
