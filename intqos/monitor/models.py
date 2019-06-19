@@ -3,12 +3,9 @@ from netaddr import *
 from mongoengine import *
 from common.models import *
 from jinja2 import Environment, FileSystemLoader
-<<<<<<< HEAD
 from intqos.intqos.settings import NET_CONF_TEMPLATES
 from napalm import get_network_driver 
-=======
 from intqos.settings import NET_CONF_TEMPLATES
->>>>>>> 29a5d7329a13873d308b9ee460e1c91e65bca9a4
 
 
 class interface(interface):
@@ -132,15 +129,12 @@ class netflow_fields(DynamicDocument):
 	flow = ReferenceField(flow)
 	#=======================================
 
-<<<<<<< HEAD
 class ip_sla(document):
 	operation = SequenceField()
 	device_ref = ReferenceField(device)
 
-=======
 class ip_sla(Document):
 	operation = IntField(required= True)
->>>>>>> 29a5d7329a13873d308b9ee460e1c91e65bca9a4
 
 
 
