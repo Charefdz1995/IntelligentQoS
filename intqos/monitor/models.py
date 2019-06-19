@@ -4,6 +4,7 @@ from mongoengine import *
 from intqos.common.models import *
 from jinja2 import Environment, FileSystemLoader
 from intqos.intqos.settings import NET_CONF_TEMPLATES
+from napalm import get_network_driver 
 
 
 class interface(interface):
@@ -28,56 +29,51 @@ class device(device):
 		for interface in self.interfaces : 
 			interfaces_output += interface.configure_netflow()
 
-		return global_output + interfaces_output
+		config = (global_output + interfaces_output).splitlines()
 
-	def configure_ip_sla(self,operation,dst_ip,dst_port,src_ip,src_port):
+		return self.connect().cli(config)
+
+	def configure_ip_sla(self,operation,record):
 		env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
 		template = env.get_template("ip_sla.j2")
-		output = template.render(operation = operation,dst_ip =dst_ip,
-								dst_port = dst_port ,src_ip = src_ip ,src_port = src_port)
+		output = template.render(operation = operation,record = record)
+		config = output.splitlines()
+		return self.connect().cli(config)
 
-		return output
+
 	def configure_ip_sla_responder(self):
-		return ['ip sla responder']
+		return self.connect().cli(['ip sla responder'])
+
 
 	def pull_ip_sla_stats(operation,src_device):
 		jitter_cmd = "show ip sla statistics {} | include Destination to Source Jitter".format(str(operation))
 		delay_cmd = "show ip sla statistics {} | include Destination to Source Latency".format(str(operation))
-		pakcet_loss = None
-		# The result are saved here to be parsed
+		config = [jitter_cmd,delay_cmd]
 
-		result_jitter = None
-		result_delay = None
+		result = self.connect().cli(config)
 
-		# after getting the result of this
-		jitter = re.findall("\+d",result_jitter)
-		jitter = int(jitter[1])
-		delay = re.findall("\+d",result_delay)
-		delay = int(delay[1])
-        
-	def push_config(self,config_commands):
-		from netmiko import ConnectHandler 
+		jitter = int(re.findall("\+d",result[jitter_cmd])[1])
+		delay = int(re.findall("\+d",result[delay_cmd])[1])
 
-		device_info = {
-			"device_type" : "cisco_ios", 
-			"ip" : self.management.management_address,
-			"username" : self.management.username, 
-			"password" : self.management.password, 
-		}
+		return jitter, delay 
+s
 
+
+	def connect(self):
+		driver = get_network_driver("ios")
+		device = None
 		try:
-			device = ConnectHandler(**device_info)
-			config_commands = config_commands.splitlines()
-			device.send_config_set(config_commands)
-			device.disconnect()
+			device = driver(self.management.management_address,self.management.username,
+							self.management.password)
+			device.open()
 		except Exception as e:
 			print(e)
+		return device
 
 
 class topology(topology):
 
 	def get_ip_sla_devices(self,record):
-
 		src_ip = IPAddress(record.IPV4.SRC.ADDR) 
 		dst_ip = IPAddress(record.IPV4.DST.ADDR)
 		src_device = None
@@ -133,14 +129,16 @@ class netflow_fields(DynamicDocument):
 	#=======================================
 
 class ip_sla(document):
-	operation = IntField(required= True)
+	operation = SequenceField()
+	device_ref = ReferenceField(device)
+
 
 
 
 class ip_sla_info(document):
 	avg_jitter = IntField(required = True)
 	avg_delay = IntField(required = True)
-	packet_loss = IntField(required = True)
+	packet_loss = IntField(required = False) # For the moment it is false because i dont know how to get it 
 	timestamp = StringField(required = True)
 	flow_ref = ReferenceField(flow)
-	ip_sla_info = ReferenceField(ip_sla)
+	ip_sla_ref = ReferenceField(ip_sla)

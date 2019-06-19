@@ -4,11 +4,18 @@ from mongoengine import *
 import mongoengine
 from scapy.all import * 
 from scapy.layers.netflow import NetflowSession
+from functools import partial
 
-def dbcollect(pkt):
+
+def dbcollect(phb_behavior:topology,pkt):
+
         mongoengine.connect("flowsdb", host = "0.0.0.0",port = 27017)
         sys_uptime = pkt[NetflowHeaderV9].sysUptime
-        monitor  = device.objects(pkt[IP].src)[0]
+        devices = phb_behavior.devices
+        monitor = None 
+        for device in devices:
+                if (device.loopback_addr == pkt[IP].src):
+                        monitor = device
         flows = None
         try:
                 flows = pkt[NetflowDataflowsetV9].records
@@ -36,9 +43,12 @@ def dbcollect(pkt):
 
                         flow_hash = hashlib.md5(flow_input.encode())
                         print("quering the database if flow exists")
+
+                        src_device , dst_device = phb_behavior.get_ip_sla_devices(record)
+
                         flow_exist = None
                         flow_exist = flow.objects(flow_id= flow_hash.hexdigest())
-                        if not(flow_exist) :
+                        if not(flow_exist):
                                 print("new flow is occured")
                                 flow_ins = flow()
                                 flow_ins.flow_id = str(flow_hash.hexdigest())
@@ -55,17 +65,22 @@ def dbcollect(pkt):
                                 netflow_fields_ins.save()
                                 print("new flow is added")
                                 print("new ip sla is configured for this flow")
+                                dst_device.configure_ip_sla_responder()
+                                sla = ip_sla()
+                                sla.device_ref = src_device
+                                sla.save()
+                                src_device.configure_ip_sla(sla.operation,record) # TODO : be more specfic in the interface loopback of the dst_device
                         else:
                                 netflow_fields_ins.device = monitor
                                 netflow_fields_ins.flow_ref = flow_exist[0]
                                 netflow_fields_ins.save()
-                                print("an old flow informationare added is added")
-                                print("pull ip sla information")           
+                                src_device.pull_ip_sla_stats() # TODO: be more specific in the function to make reference it with flow
+                                
         
 
         except Exception as e :
                 print(e)
 
 
-def Sniff_Netflow():
-        sniff(session = NetflowSession , filter = "dst port 2055", prn = dbcollect)
+def Sniff_Netflow(phb_behavior):
+        sniff(session = NetflowSession , filter = "dst port 2055", prn = partial(dbcollect,phb_behavior))
