@@ -3,7 +3,7 @@ from netaddr import *
 from mongoengine import *
 from common.models import *
 from jinja2 import Environment, FileSystemLoader
-from intqos.intqos.settings import NET_CONF_TEMPLATES
+from intqos.settings import NET_CONF_TEMPLATES
 from napalm import get_network_driver 
 from intqos.settings import NET_CONF_TEMPLATES
 
@@ -56,9 +56,7 @@ class device(device):
 		jitter = int(re.findall("\+d",result[jitter_cmd])[1])
 		delay = int(re.findall("\+d",result[delay_cmd])[1])
 
-		return jitter, delay 
-s
-
+		return jitter, delay
 
 	def connect(self):
 		driver = get_network_driver("ios")
@@ -129,7 +127,7 @@ class netflow_fields(DynamicDocument):
 	flow = ReferenceField(flow)
 	#=======================================
 
-class ip_sla(document):
+class ip_sla(Document):
 	operation = SequenceField()
 	device_ref = ReferenceField(device)
 
@@ -141,5 +139,5 @@ class ip_sla_info(Document):
 	avg_delay = IntField(required = True)
 	packet_loss = IntField(required = False) # For the moment it is false because i dont know how to get it 
 	timestamp = StringField(required = False) # temporary false until see how the netflow is sniffing the timestamp to combine it with ip sla 
- 	flow_ref = ReferenceField(flow)
+	flow_ref = ReferenceField(flow)
 	ip_sla_ref = ReferenceField(ip_sla)
