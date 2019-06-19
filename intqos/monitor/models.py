@@ -140,6 +140,6 @@ class ip_sla_info(Document):
 	avg_jitter = IntField(required = True)
 	avg_delay = IntField(required = True)
 	packet_loss = IntField(required = False) # For the moment it is false because i dont know how to get it 
-	timestamp = StringField(required = True)
-	flow_ref = ReferenceField(flow)
+	timestamp = StringField(required = False) # temporary false until see how the netflow is sniffing the timestamp to combine it with ip sla 
+ 	flow_ref = ReferenceField(flow)
 	ip_sla_ref = ReferenceField(ip_sla)

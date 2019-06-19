@@ -74,10 +74,16 @@ def dbcollect(phb_behavior:topology,pkt):
                                 netflow_fields_ins.device = monitor
                                 netflow_fields_ins.flow_ref = flow_exist[0]
                                 netflow_fields_ins.save()
-                                src_device.pull_ip_sla_stats() # TODO: be more specific in the function to make reference it with flow
-                                
-        
-
+                                jitter , delay = src_device.pull_ip_sla_stats()
+                                sla = ip_sla()
+                                sla.device_ref = src_device
+                                sla.save()
+                                sla_infp = ip_sla_info()
+                                sla_info.avg_jitter = jitter 
+                                sla_info.avg_delay = delay 
+                                sla_info.flow_ref = flow_exist[0]
+                                sla_info.ip_sla_ref = sla
+                                sla_info.save() 
         except Exception as e :
                 print(e)
 
