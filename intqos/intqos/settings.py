@@ -95,7 +95,7 @@ DATABASES = {
  #   'mongodb://%s:%s@%s/%s' \
 #  % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
 
-mongoengine.connect('hamid', host='0.0.0.0',port = 27017)
+mongoengine.connect('hamid', host='127.0.0.1',port = 28000)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

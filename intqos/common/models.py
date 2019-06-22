@@ -45,6 +45,7 @@ class link(DynamicDocument):
 
 class topology(DynamicDocument):
         topology_name = StringField(required=True)
+        topology_desc = StringField(required=False)
         devices = ListField(ReferenceField(device))
         links = ListField(ReferenceField(link))
         meta = {'abstract' : True}

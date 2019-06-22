@@ -3,11 +3,10 @@ from netaddr import *
 from mongoengine import *
 from common.models import *
 from jinja2 import Environment, FileSystemLoader
-from intqos.settings import NET_CONF_TEMPLATES
 from napalm import get_network_driver 
 from intqos.settings import NET_CONF_TEMPLATES
 import numpy as np 
-from utils import valid_cover
+from .utils import valid_cover
 
 
 
@@ -49,7 +48,7 @@ class device(device):
 		return self.connect().cli(['ip sla responder'])
 
 
-	def pull_ip_sla_stats(operation,src_device):
+	def pull_ip_sla_stats(self,operation,src_device):
 		jitter_cmd = "show ip sla statistics {} | include Destination to Source Jitter".format(str(operation))
 		delay_cmd = "show ip sla statistics {} | include Destination to Source Latency".format(str(operation))
 		config = [jitter_cmd,delay_cmd]
@@ -98,19 +97,19 @@ class topology(topology):
 			row_index = self.devices.index(to_device)
 			column_index = self.devices.index(from_device)
 			matrix[row_index][column_index] = 1
-		    cover = []
+			cover = []
 
-    	valid, num_edge = valid_cover(matrix, cover)
-    	while not valid:
-        	m = [x for x in range(0, len(num_edge)) if num_edge[x] == max(num_edge)][0]
-        	cover.append(m)
-        	valid, num_edge = valid_cover(matrix, cover)
+		valid, num_edge = valid_cover(matrix, cover)
+		while not valid:
+			m = [x for x in range(0, len(num_edge)) if num_edge[x] == max(num_edge)][0]
+			cover.append(m)
+			valid, num_edge = valid_cover(matrix, cover)
 
 		monitors = []	
-        for i in cover:
-        	monitors.append(self.devices[i])
+		for i in cover:
+			monitors.append(self.devices[i])
 
-    	return monitors 
+		return monitors
 
 
 

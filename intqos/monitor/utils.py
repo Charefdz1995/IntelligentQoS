@@ -78,7 +78,7 @@ def dbcollect(phb_behavior:topology,pkt):
                                 sla = ip_sla()
                                 sla.device_ref = src_device
                                 sla.save()
-                                sla_infp = ip_sla_info()
+                                sla_info = ip_sla_info()
                                 sla_info.avg_jitter = jitter 
                                 sla_info.avg_delay = delay 
                                 sla_info.flow_ref = flow_exist[0]
@@ -105,4 +105,4 @@ def valid_cover(graph, cover):
                     valid = False
                     num_edge[i] += 1
                     num_edge[j] += 1
-return valid, num_edge
+    return valid, num_edge
