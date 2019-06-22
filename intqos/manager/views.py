@@ -56,8 +56,8 @@ def index(request):
     #
     # swit.save()
 
-    switches=switch.objects(hostname="router1")
-    swit=switches[0]
+    switches = switch.objects(hostname="router1")
+    swit = switches[0]
     # print(swit.hostname)
     # for interface in swit.interfaces:
     #     if interface.zone_type=="Egress":
@@ -199,12 +199,12 @@ def index(request):
     # management.save()
     # LabOut.save()
     # swit.save()
-    env = Environment(loader = FileSystemLoader(NET_CONF_TEMPLATES))
+    env = Environment(loader=FileSystemLoader(NET_CONF_TEMPLATES))
     baseline = env.get_template("base.j2")
-    policies = policyOut.objects
-    dscp_list=dscp.objects
+    policies = policy_out.objects
+    dscp_list = dscp.objects
     print(dscp_list)
-    output = baseline.render(switch = swit,policies=policies,dscp_list=dscp_list)
+    output = baseline.render(switch=swit, policies=policies, dscp_list=dscp_list)
     print(output)
     # # Nobaseline = env.get_template("Nobaseline.j2")
     # NoPolicyOut = env.get_template("NoPolicyOut.j2")

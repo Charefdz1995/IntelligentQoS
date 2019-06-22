@@ -1,5 +1,5 @@
 {% if switch.zone_type == 'Ingress'  %}
-{% for class in switch.policyIn.classes %}
+{% for class in switch.policy_in.classes %}
 class-map {{class.name}}
 {{class.match}}
 {% endfor %}
@@ -11,7 +11,7 @@ set dscp {{class.dscp_value}}
 {% for interface in switch.interfaces %}
 {% if interface.zone_type == 'Ingress'  %}
 interface {{interface.interface_name}}
-service-policy input {{switch.policyIn.name}}
+service-policy input {{switch.policy_in.name}}
 exit
 {% endif %}
 {% endfor %}

@@ -8,7 +8,7 @@ zone_type = (('Egress', 'Egress'), ('Ingress', 'Ingress'))
 match_type = ('match-any', 'match-all')
 priority = (('high', '4'), ('priorty', '3'), ('medium', '2'), ('low', '1'))
 drop_prob = (('high', '3'), ('medium', '2'), ('low', '1'))
-appType = (
+app_type = (
 'Application', 'Protocol', 'application-group', 'device-class', 'media-type', 'Attribute', 'Category', 'sub-category')
 
 
@@ -109,7 +109,7 @@ class application(Document):
     name = StringField()
     num = StringField()
     policy = BooleanField(default=False)
-    applicationType = StringField(choices=appType)
+    application_type = StringField(choices=app_type)
     match = StringField()
     priority = StringField(required=False)
     drop_prob = StringField(required=False)
@@ -151,7 +151,7 @@ class interface(interface):
     zone_type = StringField(choices=zone_type)
 
 
-class policyIn(Document):
+class policy_in(Document):
     name = StringField(required=True)
     classes = ListField(ReferenceField(application))
 
@@ -164,7 +164,7 @@ class regroupment_class(Document):
     policing = EmbeddedDocumentField(policing)
 
 
-class policyOut(Document):
+class policy_out(Document):
     name = StringField(required=True)
     interface = ReferenceField(interface)
     regroupment_classes = ListField(ReferenceField(regroupment_class))
@@ -172,7 +172,7 @@ class policyOut(Document):
 
 class switch(device):
     zone_type = StringField(choices=zone_type)
-    policyIn = ReferenceField(policyIn)
+    policy_in = ReferenceField(policy_in)
 
 
 class dscp(Document):
