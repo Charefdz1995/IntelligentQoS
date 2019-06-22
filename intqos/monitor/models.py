@@ -6,6 +6,9 @@ from jinja2 import Environment, FileSystemLoader
 from intqos.intqos.settings import NET_CONF_TEMPLATES
 from napalm import get_network_driver 
 from intqos.settings import NET_CONF_TEMPLATES
+import numpy as np 
+from utils import valid_cover
+
 
 
 class interface(interface):
@@ -89,6 +92,32 @@ class topology(topology):
 				if dst_ip in network:
 					dst_device = device
 		return src_device,dst_device
+
+	def vertex(self):
+		devices_num = len(self.devices)
+		matrix = np.zeros(shape = (devices_num,devices_num))
+		for link in self.links:
+			row_index = self.devices.index(to_device)
+			column_index = self.devices.index(from_device)
+			matrix[row_index][column_index] = 1
+		    cover = []
+
+    	valid, num_edge = valid_cover(matrix, cover)
+    	while not valid:
+        	m = [x for x in range(0, len(num_edge)) if num_edge[x] == max(num_edge)][0]
+        	cover.append(m)
+        	valid, num_edge = valid_cover(matrix, cover)
+
+		monitors = []	
+        for i in cover:
+        	monitors.append(self.devices[i])
+
+    	return monitors 
+
+
+
+
+
 
 
 	def kill_ip_sla(self): #TODO : killing the ip sla of inactive flows after 5 min 

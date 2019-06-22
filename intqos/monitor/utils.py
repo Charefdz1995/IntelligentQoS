@@ -90,3 +90,19 @@ def dbcollect(phb_behavior:topology,pkt):
 
 def Sniff_Netflow(phb_behavior):
         sniff(session = NetflowSession , filter = "dst port 2055", prn = partial(dbcollect,phb_behavior))
+
+
+
+
+
+def valid_cover(graph, cover):
+    valid = True
+    num_edge = [0] * len(graph)
+    for i in range(0, len(graph)):
+        for j in range(i, len(graph)):
+            if graph[i][j] == 1:
+                if (i not in cover) and (j not in cover):
+                    valid = False
+                    num_edge[i] += 1
+                    num_edge[j] += 1
+return valid, num_edge
